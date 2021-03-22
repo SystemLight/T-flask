@@ -1,10 +1,12 @@
 from flask import Flask
 
-from views.hello import hello_blueprint
+from controllers import register_controllers
+from views import register_views
+
+app = Flask(__name__)
 
 if __name__ == '__main__':
-    app = Flask(__name__)
-
-    app.register_blueprint(hello_blueprint)
+    register_controllers(app)
+    register_views(app)
 
     app.run()

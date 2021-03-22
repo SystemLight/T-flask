@@ -1,8 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
-hello_blueprint = Blueprint("hello", __name__)
+hello_views = Blueprint("hello", __name__)
 
 
-@hello_blueprint.route("/say_hello")
-def say_hello():
-    return "hello"
+@hello_views.route("/hello")
+def hello():
+    return render_template("hello.html", name="Hello")
