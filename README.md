@@ -24,3 +24,13 @@ pipenv install
 ## License
 
 T-flask uses the MIT license, see LICENSE file for the details.
+
+```
+在项目根目录下执行命令
+
+启动：uwsgi --ini uwsgi.ini
+
+重启：uwsgi --reload uwsgi.pid
+
+停止：uwsgi --stop uwsgi.pid
+```

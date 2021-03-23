@@ -5,8 +5,10 @@ from views import register_views
 
 app = Flask(__name__)
 
-if __name__ == '__main__':
-    register_controllers(app)
-    register_views(app)
+app.secret_key = "SystemLight"
 
+register_controllers(app)
+register_views(app)
+
+if __name__ == '__main__':
     app.run()
