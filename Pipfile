@@ -1,5 +1,5 @@
 [[source]]
-url = "https://pypi.org/simple"
+url = "https://mirrors.aliyun.com/pypi/simple/"
 verify_ssl = true
 name = "pypi"
 
@@ -7,6 +7,7 @@ name = "pypi"
 flask = "*"
 flask-restful = "*"
 requests = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 

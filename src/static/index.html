@@ -2,11 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Static</title>
+    <title>T-flask</title>
+    <style>
+        .miku-wrap {
+            border: 1px solid #fafafa;
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        .miku {
+            color: #39C5BB;
+            box-shadow: 3px 3px 3px #3333;
+            border-top: 2px solid #fafafa;
+            padding: 18px 0;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .miku-body {
+            text-align: center;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .miku-body > img {
+            max-width: 800px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Hello Static</h1>
+<div class="miku-wrap">
+    <h1 class="miku">Hello T-flask</h1>
+    <div class="miku-body">
+        <img src="static/images/miku.webp" alt="miku">
+    </div>
+</div>
 
 </body>
 </html>

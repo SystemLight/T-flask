@@ -1,14 +1,24 @@
 from flask import Flask
 
-from controllers import register_controllers
-from views import register_views
+from mvc import use_mvc
 
-app = Flask(__name__)
-
+app: Flask = use_mvc(Flask(__name__))
 app.secret_key = "SystemLight"
 
-register_controllers(app)
-register_views(app)
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def spa(path):
+    """
+
+    SPA单页应用路由
+
+    :param path:
+    :return:
+
+    """
+    return app.send_static_file("index.html")
+
 
 if __name__ == '__main__':
     app.run()
