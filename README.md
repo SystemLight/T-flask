@@ -21,6 +21,10 @@ pipenv install
 
 3. T-flask默认使用阿里源仓库作为安装源
 
+4. 注意事项
+
+- 控制器和视图中的blue_print变量会自动注册蓝图，如果没有识别到会抛出异常
+
 ## License
 
 T-flask uses the MIT license, see LICENSE file for the details.
