@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 from flask import Flask
+import click
 
 from mvc import use_mvc
+from mvc.modules import db
 
 app: Flask = Flask(__name__)
 app.secret_key = "SystemLight"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-use_mvc(app)
+use_mvc(app, need_migrate=False)
 
 
 @app.route("/", defaults={"path": ""})
@@ -41,7 +43,8 @@ def bad_request(e):
 
 
 @app.cli.command("initdb")
-def init_db():
+@click.option("--drop", is_flag=True, help="Create after drop.")
+def init_db(drop):
     """
 
     注册flask命令行初始化数据库
@@ -49,7 +52,12 @@ def init_db():
     :return:
 
     """
-    ...
+    if drop:
+        click.confirm("This operation will delete the database, do you want to continue?", abort=True)
+        db.drop_all()
+        click.echo("Drop tables.")
+    db.create_all()
+    click.echo("Initialized database.")
 
 
 if __name__ == '__main__':

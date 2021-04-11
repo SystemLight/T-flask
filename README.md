@@ -25,16 +25,15 @@ pipenv install
 
 - 控制器和视图中的blue_print变量会自动注册蓝图，如果没有识别到会抛出异常
 
+5. 部署nginx代理uwsgi配置
+
+```
+location / {
+    include uwsgi_params;
+    uwsgi_pass unix:[PROJECT_PATH]/uwsgi.sock
+}
+```
+
 ## License
 
 T-flask uses the MIT license, see LICENSE file for the details.
-
-```
-在项目根目录下执行命令
-
-启动：uwsgi --ini uwsgi.ini
-
-重启：uwsgi --reload uwsgi.pid
-
-停止：uwsgi --stop uwsgi.pid
-```
