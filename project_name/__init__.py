@@ -1,15 +1,13 @@
-#!/usr/bin/env python3
-from flask import Flask
 import click
+from flask import Flask
+from flask_migrate import Migrate
 
-from mvc import use_mvc
-from mvc.modules import db
+from .db import db
+from . import models
+from . import routes
 
 app: Flask = Flask(__name__)
-app.secret_key = "SystemLight"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-use_mvc(app, need_migrate=False)
+migrate = Migrate()
 
 
 @app.route("/", defaults={"path": ""})
@@ -47,9 +45,7 @@ def bad_request(e):
 def init_db(drop):
     """
 
-    注册flask命令行初始化数据库
-
-    :return:
+    init the app database.
 
     """
     if drop:
@@ -60,5 +56,11 @@ def init_db(drop):
     click.echo("Initialized database.")
 
 
-if __name__ == '__main__':
-    app.run()
+app.config["SECRET_KEY"] = "SystemLight"
+app.config["JSON_AS_ASCII"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+migrate.init_app(app, db)
+routes.init_app(app)
