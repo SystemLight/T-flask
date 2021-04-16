@@ -1,13 +1,15 @@
 import click
 from flask import Flask
 from flask_migrate import Migrate
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
-from .db import db
+from .db import db, session
 from . import models
 from . import routes
 
 app: Flask = Flask(__name__)
-migrate = Migrate()
+app.config.from_pyfile("config.py")
 
 
 @app.route("/", defaults={"path": ""})
@@ -56,11 +58,8 @@ def init_db(drop):
     click.echo("Initialized database.")
 
 
-app.config["SECRET_KEY"] = "SystemLight"
-app.config["JSON_AS_ASCII"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+migrate = Migrate(app, db)
+admin = Admin(app, name="microblog", template_mode="bootstrap4")
+admin.add_view(ModelView(models.person.Person, session))
 db.init_app(app)
-migrate.init_app(app, db)
 routes.init_app(app)

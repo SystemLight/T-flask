@@ -12,6 +12,7 @@ python-dotenv = "*"
 flask-wtf = "*"
 flask-sslify = "*"
 flask-migrate = "*"
+flask-admin = "*"
 
 [dev-packages]
 
