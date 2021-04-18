@@ -6,13 +6,14 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-restful = "*"
-requests = "*"
 flask-sqlalchemy = "*"
-python-dotenv = "*"
 flask-wtf = "*"
 flask-sslify = "*"
 flask-migrate = "*"
 flask-admin = "*"
+flask-babelex = "*"
+python-dotenv = "*"
+requests = "*"
 
 [dev-packages]
 

@@ -1,9 +1,8 @@
 import click
-from flask import Flask
+from flask import Flask, render_template
 from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-
 from .db import db, session
 from . import models
 from . import routes
@@ -24,6 +23,11 @@ def spa(path):
 
     """
     return app.send_static_file("index.html")
+
+
+@app.route("/home", methods=["GET"])
+def home():
+    return render_template("home.html")
 
 
 @app.errorhandler(400)
@@ -59,7 +63,7 @@ def init_db(drop):
 
 
 migrate = Migrate(app, db)
-admin = Admin(app, name="microblog", template_mode="bootstrap4")
+admin = Admin(app, name="后台管理", template_mode="bootstrap4")
 admin.add_view(ModelView(models.person.Person, session))
 db.init_app(app)
 routes.init_app(app)
