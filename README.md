@@ -31,9 +31,13 @@ name = "pypi"
 4. 部署nginx代理uwsgi配置
 
 ```
+# 开启uwsgi
+uwsgi --ini ./uwsgi.ini
+
+# 配置/etc/nginx/sites-enabled/default
 location / {
     include uwsgi_params;
-    uwsgi_pass unix:[PROJECT_PATH]/uwsgi.sock
+    uwsgi_pass 127.0.0.1:5000
 }
 ```
 
