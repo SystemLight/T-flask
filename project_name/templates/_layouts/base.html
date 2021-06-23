@@ -1,18 +1,32 @@
 {% import "_layouts/static.html" as static with context %}
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="zh-cn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Title{% endblock %}</title>
-    {% block head %}
-        {{ static.jquery3() }}
-        {{ static.bootstrap4() }}
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x5-fullscreen" content="false">
+    <meta name="full-screen" content="no">
+    <meta name="apple-mobile-web-app-capable" content="no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    {% block keyword %}
+        <meta name="keywords" content="关键字"/>
+        <meta name="description" content="描述"/>
+    {% endblock %}
+    {% block head_lib %}
+        {{ static.vue() }}
+        {{ static.elementUI() }}
     {% endblock %}
 </head>
 <body>
+
 {% block body %}{% endblock %}
+
+<script src="/static/lib/vue.js"></script>
+<script src="/static/lib/element-ui.min.js"></script>
+{% block script %}
+{% endblock %}
 </body>
 </html>
