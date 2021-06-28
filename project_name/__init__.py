@@ -1,13 +1,11 @@
 from flask import Flask, redirect, render_template, request
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user, AnonymousUserMixin
 from flask_migrate import Migrate
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
+import click
 
-from .db import db, session
 from . import routes
-from . import cli
 from . import models
+from .db import db, session
 from .models.login_form import LoginForm
 from .models.user_auth import UserAuth
 
@@ -16,6 +14,8 @@ app.config.from_pyfile("config.py")
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
+
+migrate = Migrate(app, db)
 
 
 @login_manager.user_loader
@@ -82,10 +82,21 @@ def spa_route(path: str):
     return app.send_static_file("index.html")
 
 
-migrate = Migrate(app, db)
-# admin = Admin(app, name="后台管理", template_mode="bootstrap4")
-# admin.add_view(ModelView(models.person.Person, session))
+@app.cli.command("initdb")
+@click.option("--drop", is_flag=True, help="Create after drop.")
+def init_db(drop):
+    """
 
-cli.init_app(app)
+    init the app database.
+
+    """
+    if drop:
+        click.confirm("This operation will delete the database, do you want to continue?", abort=True)
+        db.drop_all()
+        click.echo("Drop tables.")
+    db.create_all()
+    click.echo("Initialized database.")
+
+
 db.init_app(app)
 routes.init_app(app)

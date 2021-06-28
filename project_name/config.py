@@ -1,5 +1,6 @@
 SECRET_KEY = "SystemLight"
 JSON_AS_ASCII = False
+RESTFUL_JSON = {"ensure_ascii": JSON_AS_ASCII}
 
 DATABASE_FILE = "foo.db"
 SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_FILE}"

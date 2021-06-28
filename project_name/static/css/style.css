@@ -1,0 +1,315 @@
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-family: "Segoe UI", Arial, "Microsoft YaHei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+caption,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+}
+
+ul,
+dl,
+ol {
+    list-style: none;
+}
+
+.clearfix:after {
+    content: "";
+    display: block;
+    height: 0;
+    visibility: hidden;
+    clear: both;
+}
+
+.box-wrap {
+    min-width: 1080px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.text-right {
+    text-align: right;
+    color: #333333;
+}
+
+.text-center {
+    text-align: center;
+    color: #333333;
+}
+
+.text-left {
+    text-align: left;
+    color: #333333;
+}
+
+.ml-5 {
+    margin-left: 25px;
+}
+
+.ml-4 {
+    margin-left: 20px;
+}
+
+.ml-3 {
+    margin-left: 15px;
+}
+
+.ml-2 {
+    margin-left: 10px;
+}
+
+.ml-1 {
+    margin-left: 5px;
+}
+
+.mr-5 {
+    margin-right: 25px;
+}
+
+.mr-4 {
+    margin-right: 20px;
+}
+
+.mr-3 {
+    margin-right: 15px;
+}
+
+.mr-2 {
+    margin-right: 10px;
+}
+
+.mr-1 {
+    margin-right: 5px;
+}
+
+.mx-5 {
+    margin: 0 25px;
+}
+
+.mx-4 {
+    margin: 0 20px;
+}
+
+.mx-3 {
+    margin: 0 15px;
+}
+
+.mx-2 {
+    margin: 0 10px;
+}
+
+.mx-1 {
+    margin: 0 5px;
+}
+
+.my-5 {
+    margin: 25px 0;
+}
+
+.my-4 {
+    margin: 20px 0;
+}
+
+.my-3 {
+    margin: 15px 0;
+}
+
+.my-2 {
+    margin: 10px 0;
+}
+
+.my-1 {
+    margin: 5px 0;
+}
+
+.pl-5 {
+    padding-left: 25px;
+}
+
+.pl-4 {
+    padding-left: 20px;
+}
+
+.pl-3 {
+    padding-left: 15px;
+}
+
+.pl-2 {
+    padding-left: 10px;
+}
+
+.pl-1 {
+    padding-left: 5px;
+}
+
+.pr-5 {
+    padding-right: 25px;
+}
+
+.pr-4 {
+    padding-right: 20px;
+}
+
+.pr-3 {
+    padding-right: 15px;
+}
+
+.pr-2 {
+    padding-right: 10px;
+}
+
+.pr-1 {
+    padding-right: 5px;
+}
+
+.px-5 {
+    padding: 0 25px;
+}
+
+.px-4 {
+    padding: 0 20px;
+}
+
+.px-3 {
+    padding: 0 15px;
+}
+
+.px-2 {
+    padding: 0 10px;
+}
+
+.px-1 {
+    padding: 0 5px;
+}
+
+.py-5 {
+    padding: 25px 0;
+}
+
+.py-4 {
+    padding: 20px 0;
+}
+
+.py-3 {
+    padding: 15px 0;
+}
+
+.py-2 {
+    padding: 10px 0;
+}
+
+.py-1 {
+    padding: 5px 0;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-around {
+    display: flex;
+    justify-content: space-around;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-item {
+    flex: 1;
+}
+
+.flex-item-start {
+    align-items: start;
+}
+
+.flex-item-center {
+    align-items: center;
+}
+
+.flex-item-end {
+    align-items: end;
+}
+
+.flex-item-end2 {
+    align-items: flex-end;
+}
