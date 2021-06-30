@@ -5,13 +5,10 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flask-restful = "*"
 flask-sqlalchemy = "*"
 flask-wtf = "*"
 flask-sslify = "*"
 flask-migrate = "*"
-flask-admin = "*"
-flask-babelex = "*"
 python-dotenv = "*"
 requests = "*"
 flask-cors = "*"

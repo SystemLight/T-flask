@@ -41,6 +41,26 @@ location / {
 }
 ```
 
+```shell
+# 停止指定uwsgi
+uwsgi --stop uwsgi.pid
+
+# 停止所有uwsgi
+pkill -f uwsgi -9
+
+# 启动uWSGI服务器
+uwsgi --ini uwsgi.ini
+ 
+# 重启uWSGI服务器
+sudo service uwsgi restart
+ 
+# 查看所有uWSGI进程
+ps aux | grep uwsgi
+ 
+# 停止所有uWSGI进程
+sudo pkill -f uwsgi -9
+```
+
 5. 初始化数据库
 
 ```shell
