@@ -13,6 +13,7 @@ python-dotenv = "*"
 requests = "*"
 flask-cors = "*"
 flask-login = "*"
+pymysql = "*"
 
 [dev-packages]
 
