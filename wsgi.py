@@ -2,13 +2,17 @@
 import click
 from flask import Flask, redirect, render_template, request, make_response
 from flask_login import LoginManager, login_required, logout_user, login_user, UserMixin
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Session, scoped_session
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import fields, validators
 
+from models import db, MyUser
+
 import os
+import shutil
+import glob
+import re
 from typing import Union
 
 # ===================================初始化Flask Start========================#
@@ -17,14 +21,14 @@ app: Flask = Flask(__name__)
 app.config["SECRET_KEY"] = "SystemLight"
 app.config["JSON_AS_ASCII"] = False
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://trial:df2wDr8jSFw6cCkL@192.168.52.181/trial"
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
-db = SQLAlchemy(app)
+db.init_app(app)
 session: Union[Session, scoped_session] = db.session
 
 migrate = Migrate(app, db)
@@ -34,21 +38,10 @@ migrate = Migrate(app, db)
 
 
 # ===================================数据模型 Start========================#
-class User(db.Model):
-    __tablename__ = "users"
-
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    phone = db.Column(db.String(11), nullable=False, unique=True)
-    password = db.Column(db.String(30), nullable=False)
-    name = db.Column(db.String(50), nullable=True)
-    age = db.Column(db.Integer(), nullable=True)
-    gender = db.Column(db.Enum("男", "女", "保密"), default="保密")
-
-
 class UserAuth(UserMixin):
 
-    def __init__(self, user_model: User):
-        self.user_model: User = user_model
+    def __init__(self, user_model: MyUser):
+        self.user_model: MyUser = user_model
 
     def get_id(self) -> int:
         return self.user_model.id
@@ -60,14 +53,14 @@ class UserAuth(UserMixin):
 
     @staticmethod
     def get(user_id: int):
-        model = session.get(User, user_id)
+        model = session.get(MyUser, user_id)
         if model:
             return UserAuth(model)
         return None
 
     @staticmethod
     def get_by_phone(phone: str):
-        model = session.query(User).filter(User.phone == phone).first()
+        model = session.query(MyUser).filter(MyUser.phone == phone).first()
         if model:
             return UserAuth(model)
         return None

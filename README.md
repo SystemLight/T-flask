@@ -78,6 +78,12 @@ flask db upgrade
 flask db downgrade
 ```
 
+7. 反向生成数据模型
+
+```shell
+flask-sqlacodegen mysql+pymysql://root:password@127.0.0.1/db_name --outfile "model.py"  --flask
+```
+
 ## License
 
 T-flask uses the MIT license, see LICENSE file for the details.
