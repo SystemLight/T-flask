@@ -9,16 +9,15 @@ from typing import Union
 
 import click
 import requests
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session as f_session
 from flask_login import LoginManager, login_required, UserMixin
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import safe_join
 from itsdangerous import TimedJSONWebSignatureSerializer, BadData
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session, scoped_session
-from marshmallow import Schema
-
-from models import *
+from marshmallow import Schema, fields as m_fields
 
 # region===================================初始化========================#
 app: Flask = Flask(__name__)
@@ -31,7 +30,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-db.init_app(app)
+db = SQLAlchemy(app)
 session: Union[Session, scoped_session] = db.session
 migrate = Migrate(app, db)
 jwt_ser = TimedJSONWebSignatureSerializer(secret_key=app.config["SECRET_KEY"], expires_in=2592000)
@@ -41,6 +40,18 @@ jwt_ser = TimedJSONWebSignatureSerializer(secret_key=app.config["SECRET_KEY"], e
 
 
 # region===================================数据模型========================#
+class MyUser(db.Model):
+    __tablename__ = 'my_user'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    phone = db.Column(db.String(50))
+    password = db.Column(db.String(50))
+    avatar = db.Column(db.String(50))
+    create_at = db.Column(db.DateTime)
+    priority = db.Column(db.Integer)
+
+
 class UserAuth(UserMixin):
 
     def __init__(self, model: MyUser):
