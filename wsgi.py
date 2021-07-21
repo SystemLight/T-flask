@@ -1,53 +1,56 @@
 #!/usr/bin/env python3
-import click
-from flask import Flask, redirect, render_template, request, make_response
-from flask_login import LoginManager, login_required, logout_user, login_user, UserMixin
-from sqlalchemy.orm import Session, scoped_session
-from flask_migrate import Migrate
-from flask_wtf import FlaskForm
-from wtforms import fields, validators
-
-from models import db, MyUser
-
 import os
-import shutil
-import glob
 import re
+import glob
+import shutil
+import uuid
+from datetime import datetime
 from typing import Union
 
-# ===================================初始化Flask Start========================#
+import click
+import requests
+from flask import Flask, redirect, render_template, request
+from flask_login import LoginManager, login_required, UserMixin
+from flask_migrate import Migrate
+from werkzeug.security import safe_join
+from itsdangerous import TimedJSONWebSignatureSerializer, BadData
+from sqlalchemy import func, text
+from sqlalchemy.orm import Session, scoped_session
+from marshmallow import Schema
+
+from models import *
+
+# region===================================初始化========================#
 app: Flask = Flask(__name__)
 
 app.config["SECRET_KEY"] = "SystemLight"
 app.config["JSON_AS_ASCII"] = False
-
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://trial:df2wDr8jSFw6cCkL@192.168.52.181/trial"
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-
 db.init_app(app)
 session: Union[Session, scoped_session] = db.session
-
 migrate = Migrate(app, db)
+jwt_ser = TimedJSONWebSignatureSerializer(secret_key=app.config["SECRET_KEY"], expires_in=2592000)
 
 
-# ===================================初始化Flask END========================#
+# endregion===================================初始化========================#
 
 
-# ===================================数据模型 Start========================#
+# region===================================数据模型========================#
 class UserAuth(UserMixin):
 
-    def __init__(self, user_model: MyUser):
-        self.user_model: MyUser = user_model
+    def __init__(self, model: MyUser):
+        self.model: MyUser = model
 
     def get_id(self) -> int:
-        return self.user_model.id
+        return self.model.id
 
     def verify_password(self, password: str) -> bool:
-        if self.user_model.password != password:
+        if self.model.password != password:
             return False
         return True
 
@@ -66,26 +69,26 @@ class UserAuth(UserMixin):
         return None
 
 
-class LoginForm(FlaskForm):
-    phone = fields.StringField("手机号", validators=[validators.DataRequired()])
-    password = fields.PasswordField("密码", validators=[validators.DataRequired()])
+# endregion===================================数据模型========================#
 
 
-class ResponseResult:
+# region===================================Flask钩子========================#
+@login_manager.request_loader
+def request_loader(req):
+    token = req.headers.get("Authorization", None)
+    if token and token.startswith("Bearer "):
+        token = token[7:len(token)]
+        try:
+            token = jwt_ser.loads(token)
+            return UserAuth.get(token["user_id"])
+        except BadData:
+            ...
+    return None
 
-    def __init__(self, code=200, msg="ok", data=None):
-        self.code = code
-        self.msg = msg
-        self.data = data
 
-
-# ===================================数据模型 End========================#
-
-
-# ===================================Flask Hook========================#
-@login_manager.user_loader
-def load_user(userid):
-    return UserAuth.get(userid)
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return make_unauthorized("权限校验失败")
 
 
 @app.cli.command("initdb")
@@ -104,56 +107,239 @@ def init_db(drop):
     click.echo("Initialized database.")
 
 
-# ===================================Flask Hook========================#
+# endregion===================================Flask Hook========================#
 
 
-# ===================================普通路由========================#
+# region===================================注册路由========================#
 @app.route("/", methods=["GET"])
 def index():
+    """
+
+    主页
+
+    :return:
+
+    """
     return app.send_static_file("index.html")
 
 
-@app.route("/protect_route", methods=["GET"])
-@login_required
-def protect_route():
-    return {"msg": "ok"}
+@app.route("/api/user/<uid>", methods=["GET"])
+def get_user(uid):
+    """
+
+    [api]-获取指定用户信息
+
+    :param uid:
+    :return:
+
+    """
+    return {}
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/api/user/<uid>", methods=["POST"])
+def set_user(uid):
+    """
+
+    [api]-修改指定用户信息
+
+    :param uid:
+    :return:
+
+    """
+    return {}
+
+
+@app.route("/api/upload_demo", methods=["POST"])
+def upload_demo():
+    """
+
+    [api]-分片文件上传，注意Flask开发服务器如果上传请求次数过多会超时，导致上传失败
+
+    :return:
+
+    """
+    try:
+        file = SliceSaveFile("./static/files", "/static/files/", ChunkOptions.from_flask_request())
+        result = file.save()
+    except Exception as e:
+        return make_error(str(e))
+    return make_ok(data=result)
+
+
+@app.route("/api/oauth/captcha", methods=["POST"])
+def send_sms():
+    """
+
+    [api]-发送短信
+
+    :return:
+
+    """
+    phone = request.form["phone"]
+    return make_ok()
+
+
+@app.route("/api/login", methods=["POST"])
 def login():
-    form = LoginForm()
-    err_msg = None
+    """
 
-    if form.validate_on_submit():
-        phone = form.phone.data
-        password = form.password.data
-        user = UserAuth.get_by_phone(phone)
-        if user is None:
-            err_msg = "用户不存在"
+    [api]-用户登录
+
+    :return:
+
+    """
+    phone = request.form["phone"]
+    code = request.form["code"]
+
+    user_auth = UserAuth.get_by_phone(phone)
+    if user_auth:
+        user = user_auth.model
+    else:
+        try:
+            user = MyUser(name=phone, phone=phone, password=code)
+            session.add(user)
+        except Exception as e:
+            session.rollback()
+            return make_error(str(e))
         else:
-            if user.verify_password(password):
-                login_user(user)
-                return redirect(request.args.get("next") or "/")
-            else:
-                err_msg = "用户密码错误"
+            session.commit()
 
-    return render_template("login.html", form=form, emsg=err_msg)
+    return make_ok(data={"token": jwt_ser.dumps({"user_id": user.id}).decode()})
 
 
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/api/register", methods=["POST"])
+def register():
+    """
+
+    [api]-用户注册
+
+    :return:
+    """
+
+
+@app.route("/api/logout", methods=["POST"])
 @login_required
 def logout():
-    logout_user()
-    return redirect("/")
+    """
+
+    [api]-用户退出登录
+
+    :return:
+
+    """
+    return make_ok()
 
 
-# ===================================普通路由========================#
+# endregion===================================注册路由========================#
 
 
-# ===================================公共函数区域========================#
+# region===================================公共函数========================#
+STANDARD_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-# ===================================公共函数区域========================#
 
+def now():
+    return datetime.now().strftime(STANDARD_TIME_FORMAT)
+
+
+def dt2str(dt: datetime):
+    return dt.strftime(STANDARD_TIME_FORMAT)
+
+
+def safe_strftime(dt: datetime):
+    if isinstance(dt, datetime):
+        return dt.strftime(STANDARD_TIME_FORMAT)
+    return ""
+
+
+def make_error(msg="error", code=400, data=None):
+    return {"code": code, "msg": msg, "data": data}, code
+
+
+def make_unauthorized(msg="error", code=401, data=None):
+    return make_error(msg, code, data)
+
+
+def make_ok(msg="ok", code=200, data=None):
+    return {"code": code, "msg": msg, "data": data}, code
+
+
+class ExistsError(Exception):
+    ...
+
+
+class UploadError(Exception):
+    ...
+
+
+class ChunkOptions:
+
+    def __init__(self):
+        self.total_chunks = None
+        self.offset = None
+
+        self.chunk_block = None
+        self.chunk_id = None
+
+        self.file_id = None
+        self.file_name = None
+        self.file_size = None
+
+    def is_end_block(self):
+        return self.chunk_id + 1 == self.total_chunks
+
+    @staticmethod
+    def from_flask_request():
+        options = ChunkOptions()
+
+        options.total_chunks = int(request.form["totalChunks"])  # 总计块数量
+        options.offset = int(request.form["offset"])
+
+        options.chunk_block = request.files["chunkBlock"]
+        options.chunk_id = int(request.form["chunkID"])  # 当前块编号
+
+        options.file_id = request.form["fileID"]
+        options.file_name = request.form["fileName"]
+        options.file_size = int(request.form["fileSize"])
+
+        return options
+
+
+class SliceSaveFile:
+
+    def __init__(self, save_folder: str, url_prefix: str, options: ChunkOptions):
+        self.options = options
+
+        self.file_name, self.file_ext = os.path.splitext(options.file_name)
+        self.save_file_name = f"{options.file_id}{self.file_ext}"
+        self.save_path = safe_join(save_folder, self.save_file_name)
+        self.url_path = f"{url_prefix}{self.save_file_name}"
+
+    def save(self):
+        if self.is_exists():
+            raise ExistsError("文件已经存在")
+
+        with open(self.save_path, "ab") as f:
+            f.seek(self.options.offset)
+            f.write(self.options.chunk_block.stream.read())
+
+        if self.options.is_end_block():
+            if os.path.getsize(self.save_path) != self.options.file_size:
+                raise UploadError("上传失败")
+
+        return {
+            "name": self.file_name,
+            "url": self.url_path,
+            "uid": str(uuid.uuid1()),
+            "status": "success"
+        }
+
+    def is_exists(self):
+        if os.path.exists(self.save_path) and self.options.chunk_id == 0:
+            return True
+        return False
+
+
+# endregion===================================公共函数========================#
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=6666)
+    app.run(host="localhost", port=5555)
