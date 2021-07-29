@@ -1,30 +1,24 @@
 #!/usr/bin/env python3
 import os
-import re
-import glob
-import shutil
 import uuid
 from datetime import datetime
 from typing import Union
 
 import click
-import requests
-from flask import Flask, redirect, render_template, request, session as f_session
+from flask import Flask, request
 from flask_login import LoginManager, login_required, UserMixin
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import safe_join
 from itsdangerous import TimedJSONWebSignatureSerializer, BadData
-from sqlalchemy import func, text
 from sqlalchemy.orm import Session, scoped_session
-from marshmallow import Schema, fields as m_fields
 
 # region===================================初始化========================#
 app: Flask = Flask(__name__)
 
 app.config["SECRET_KEY"] = "SystemLight"
 app.config["JSON_AS_ASCII"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://trial:df2wDr8jSFw6cCkL@192.168.52.181/trial"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://trial:df2wDr8jSFw6cCkL@127.0.0.1/trial"
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -34,6 +28,8 @@ db = SQLAlchemy(app)
 session: Union[Session, scoped_session] = db.session
 migrate = Migrate(app, db)
 jwt_ser = TimedJSONWebSignatureSerializer(secret_key=app.config["SECRET_KEY"], expires_in=2592000)
+
+STANDARD_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 # endregion===================================初始化========================#
@@ -160,7 +156,7 @@ def set_user(uid):
     return {}
 
 
-@app.route("/api/upload_demo", methods=["POST"])
+@app.route("/api/demo/upload", methods=["POST"])
 def upload_demo():
     """
 
@@ -245,9 +241,6 @@ def logout():
 
 
 # region===================================公共函数========================#
-STANDARD_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-
 def now():
     return datetime.now().strftime(STANDARD_TIME_FORMAT)
 
@@ -260,18 +253,6 @@ def safe_strftime(dt: datetime):
     if isinstance(dt, datetime):
         return dt.strftime(STANDARD_TIME_FORMAT)
     return ""
-
-
-def make_error(msg="error", code=400, data=None):
-    return {"code": code, "msg": msg, "data": data}, code
-
-
-def make_unauthorized(msg="error", code=401, data=None):
-    return make_error(msg, code, data)
-
-
-def make_ok(msg="ok", code=200, data=None):
-    return {"code": code, "msg": msg, "data": data}, code
 
 
 class ExistsError(Exception):
@@ -348,6 +329,18 @@ class SliceSaveFile:
         if os.path.exists(self.save_path) and self.options.chunk_id == 0:
             return True
         return False
+
+
+def make_error(msg="error", code=400, data=None):
+    return {"code": code, "msg": msg, "data": data}, code
+
+
+def make_unauthorized(msg="error", code=401, data=None):
+    return make_error(msg, code, data)
+
+
+def make_ok(msg="ok", code=200, data=None):
+    return {"code": code, "msg": msg, "data": data}, code
 
 
 # endregion===================================公共函数========================#
