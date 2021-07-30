@@ -84,6 +84,67 @@ flask db downgrade
 flask-sqlacodegen mysql+pymysql://root:password@127.0.0.1/db_name --outfile "model.py"  --flask
 ```
 
+8. websocket支持
+
+- 服务端预装依赖模块
+
+    - flask-socketio
+    - gevent
+    - gevent-websocket
+
+- 客户端依赖
+
+    - socketio
+
+- uwsgi配置必须启用HTTP模式，同时不要启用多个进程工作，使用NGINX的负载均衡代替这个选项
+
+```
+[uwsgi]
+master = True
+http = 127.0.0.1:5555
+http-websockets = True
+gevent = 1000
+async = 30
+project = t-flask
+home = ./.venv
+chdir = .
+module = app
+callable = app
+processes = 1
+max-requests = 5000
+pidfile = ./uwsgi.pid
+daemonize = ./%(project).log
+vacuum = True
+```
+
+- nginx配置（版本要求1.4以上才能支持websocket代理）
+
+```
+location / {
+    proxy_cookie_domain domino_server nginx_server;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_pass http://127.0.0.1:5000;
+}
+
+location /socket.io/ {
+    proxy_pass http://127.0.0.1:5000/socket.io/;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $host;
+}
+```
+
+- 注意事项：
+
+    - 反向代理可能会跨域，设置SocketIO跨域参数即可
+    - uwsgi不要启用多进程
+
 ## License
 
 T-flask uses the MIT license, see LICENSE file for the details.
