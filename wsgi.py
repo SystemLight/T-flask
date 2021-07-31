@@ -130,33 +130,7 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route("/api/user/<uid>", methods=["GET"])
-def get_user(uid):
-    """
-
-    [api]-获取指定用户信息
-
-    :param uid:
-    :return:
-
-    """
-    return {}
-
-
-@app.route("/api/user/<uid>", methods=["POST"])
-def set_user(uid):
-    """
-
-    [api]-修改指定用户信息
-
-    :param uid:
-    :return:
-
-    """
-    return {}
-
-
-@app.route("/api/demo/upload", methods=["POST"])
+@app.route("/api/upload/demo", methods=["POST"])
 def upload_demo():
     """
 
@@ -182,11 +156,10 @@ def send_sms():
     :return:
 
     """
-    phone = request.form["phone"]
     return make_ok()
 
 
-@app.route("/api/login", methods=["POST"])
+@app.route("/api/oauth/login", methods=["POST"])
 def login():
     """
 
@@ -214,17 +187,19 @@ def login():
     return make_ok(data={"token": jwt_ser.dumps({"user_id": user.id}).decode()})
 
 
-@app.route("/api/register", methods=["POST"])
+@app.route("/api/oauth/register", methods=["POST"])
 def register():
     """
 
     [api]-用户注册
 
     :return:
+
     """
+    return make_ok()
 
 
-@app.route("/api/logout", methods=["POST"])
+@app.route("/api/oauth/logout", methods=["POST"])
 @login_required
 def logout():
     """
