@@ -2,6 +2,9 @@
 
 flask项目开发模板
 
+- wsgi.py 带有登录验证等功能的开发模板 [默认启用]
+- wsgi_simple.py 简化版本的轻量功能开发模板
+
 ## 用法
 
 1. T-snake默认使用 `pipenv` 作为包管理器，如果没有安装请执行下面命令
@@ -37,7 +40,7 @@ uwsgi --ini ./uwsgi.ini
 # 配置/etc/nginx/sites-enabled/default
 location / {
     include uwsgi_params;
-    uwsgi_pass 127.0.0.1:5000
+    uwsgi_pass 127.0.0.1:5000;
 }
 ```
 

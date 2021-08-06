@@ -5,29 +5,30 @@ from datetime import datetime
 from typing import Union
 
 import click
-from flask import Flask, request
-from flask_login import LoginManager, login_required, UserMixin
+from flask import Flask, request, render_template
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import safe_join
-from itsdangerous import TimedJSONWebSignatureSerializer, BadData
 from sqlalchemy.orm import Session, scoped_session
+from werkzeug.security import safe_join
+
+"""
+
+简化版本的T-flask，用于开发轻量应用
+
+"""
 
 # region===================================初始化========================#
 app: Flask = Flask(__name__)
 
 app.config["SECRET_KEY"] = "SystemLight"
 app.config["JSON_AS_ASCII"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://trial:df2wDr8jSFw6cCkL@127.0.0.1/trial"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-login_manager = LoginManager(app)
-login_manager.login_view = "login"
 db = SQLAlchemy(app)
 session: Union[Session, scoped_session] = db.session
 migrate = Migrate(app, db)
-jwt_ser = TimedJSONWebSignatureSerializer(secret_key=app.config["SECRET_KEY"], expires_in=2592000)
 
 STANDARD_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -36,68 +37,12 @@ STANDARD_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 # region===================================数据模型========================#
-class MyUser(db.Model):
-    __tablename__ = 'my_user'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    phone = db.Column(db.String(50))
-    password = db.Column(db.String(50))
-    avatar = db.Column(db.String(50))
-    create_at = db.Column(db.DateTime)
-    priority = db.Column(db.Integer)
-
-
-class UserAuth(UserMixin):
-
-    def __init__(self, model: MyUser):
-        self.model: MyUser = model
-
-    def get_id(self) -> int:
-        return self.model.id
-
-    def verify_password(self, password: str) -> bool:
-        if self.model.password != password:
-            return False
-        return True
-
-    @staticmethod
-    def get(user_id: int):
-        model = session.get(MyUser, user_id)
-        if model:
-            return UserAuth(model)
-        return None
-
-    @staticmethod
-    def get_by_phone(phone: str):
-        model = session.query(MyUser).filter(MyUser.phone == phone).first()
-        if model:
-            return UserAuth(model)
-        return None
 
 
 # endregion===================================数据模型========================#
 
 
 # region===================================Flask钩子========================#
-@login_manager.request_loader
-def request_loader(req):
-    token = req.headers.get("Authorization", None)
-    if token and token.startswith("Bearer "):
-        token = token[7:len(token)]
-        try:
-            token = jwt_ser.loads(token)
-            return UserAuth.get(token["user_id"])
-        except BadData:
-            ...
-    return None
-
-
-@login_manager.unauthorized_handler
-def unauthorized_handler():
-    return make_unauthorized("权限校验失败")
-
-
 @app.cli.command("initdb")
 @click.option("--drop", is_flag=True, help="Create after drop.")
 def init_db(drop):
@@ -127,89 +72,7 @@ def index():
     :return:
 
     """
-    return app.send_static_file("index.html")
-
-
-@app.route("/api/upload/demo", methods=["POST"])
-def upload_demo():
-    """
-
-    [api]-分片文件上传，注意Flask开发服务器如果上传请求次数过多会超时，导致上传失败
-
-    :return:
-
-    """
-    try:
-        file = SliceSaveFile("./static/files", "/static/files/", ChunkOptions.from_flask_request())
-        result = file.save()
-    except Exception as e:
-        return make_error(str(e))
-    return make_ok(data=result)
-
-
-@app.route("/api/oauth/captcha", methods=["POST"])
-def send_sms():
-    """
-
-    [api]-发送短信
-
-    :return:
-
-    """
-    return make_ok()
-
-
-@app.route("/api/oauth/login", methods=["POST"])
-def login():
-    """
-
-    [api]-用户登录
-
-    :return:
-
-    """
-    phone = request.form["phone"]
-    code = request.form["code"]
-
-    user_auth = UserAuth.get_by_phone(phone)
-    if user_auth:
-        user = user_auth.model
-    else:
-        try:
-            user = MyUser(name=phone, phone=phone, password=code)
-            session.add(user)
-        except Exception as e:
-            session.rollback()
-            return make_error(str(e))
-        else:
-            session.commit()
-
-    return make_ok(data={"token": jwt_ser.dumps({"user_id": user.id}).decode()})
-
-
-@app.route("/api/oauth/register", methods=["POST"])
-def register():
-    """
-
-    [api]-用户注册
-
-    :return:
-
-    """
-    return make_ok()
-
-
-@app.route("/api/oauth/logout", methods=["POST"])
-@login_required
-def logout():
-    """
-
-    [api]-用户退出登录
-
-    :return:
-
-    """
-    return make_ok()
+    return render_template("home.html")
 
 
 @app.route("/", defaults={"path": ""})
