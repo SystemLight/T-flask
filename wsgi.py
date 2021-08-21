@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import uuid
 from datetime import datetime
 from typing import Union
 
@@ -9,7 +8,6 @@ from flask import Flask, request
 from flask_login import LoginManager, login_required, UserMixin
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import safe_join
 from itsdangerous import TimedJSONWebSignatureSerializer, BadData
 from sqlalchemy.orm import Session, scoped_session
 
@@ -140,7 +138,8 @@ def upload_demo():
 
     """
     try:
-        file = SliceSaveFile("./static/files", "/static/files/", ChunkOptions.from_flask_request())
+        options = ChunkOptions.from_flask_request()
+        file = SliceSaveFile(options)
         result = file.save()
     except Exception as e:
         return make_error(str(e))
