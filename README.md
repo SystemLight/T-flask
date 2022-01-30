@@ -30,6 +30,41 @@ name = "pypi"
 
 4. 部署nginx代理uwsgi配置
 
+```text
+# 宝塔面板：Python项目管理器配置uwsgi.ini
+[uwsgi]
+master = true
+project = transfer
+socket = 127.0.0.1:5001
+chmod-socket = 666
+uid=root
+gid=root
+processes = 1
+chdir = /www/wwwroot/project_dir/server
+wsgi-file= /www/wwwroot/project_dir/server/wsgi.py
+logto = /www/wwwroot/project_dir/server/logs/error.log
+vacuum = true
+max-requests = 5000
+```
+
+```text
+# uwsgi直接命令行启动运行
+[uwsgi]
+master = True
+project = t-flask
+socket = 127.0.0.1:5001
+chmod-socket = 666
+home = ./.venv
+chdir = .
+module = wsgi
+callable = app
+processes = 1
+max-requests = 5000
+pidfile = ./uwsgi.pid
+daemonize = ./%(project).log
+vacuum = True
+```
+
 ```
 # 开启uwsgi
 uwsgi --ini ./uwsgi.ini
