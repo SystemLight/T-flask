@@ -14,8 +14,12 @@ flask-cors = "*"
 flask-login = "*"
 pymysql = "*"
 requests = "*"
-marshmallow = "*"
 python-dotenv = "*"
+flask-marshmallow = "*"
+webargs = "*"
+pillow = "*"
+captcha = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 

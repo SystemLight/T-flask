@@ -1,0 +1,18 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}403{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/error.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <img src="{{ url_for('static', filename='images/403.svg') }}" alt="403">
+        <div class="content-r">
+            <h1>403</h1>
+            <p>抱歉，你无权访问该页面</p>
+            <button class="layui-btn layui-btn-primary">返回首页</button>
+        </div>
+    </div>
+{% endblock %}
