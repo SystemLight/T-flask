@@ -1,10 +1,8 @@
 import click
 from flask import Flask
 
-from ..extensions import db
 
-
-def init_scripts(app: Flask):
+def init_scripts(app: Flask, db):
     @app.cli.command()
     @click.option("--drop", is_flag=True, help="Create after drop.")
     def initdb(drop):

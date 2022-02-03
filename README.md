@@ -2,6 +2,33 @@
 
 > Flask项目开发模板
 
+## 技术栈
+
+### 后端
+
+- [werkzeug](https://www.osgeo.cn/werkzeug/)
+- [flask](https://dormousehole.readthedocs.io/en/latest/index.html)
+- [sqlalchemy](https://docs.sqlalchemy.org/en/14/contents.html)
+- [flask-sqlalchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/quickstart/)
+- [flask-sqlacodegen](https://github.com/ksindi/flask-sqlacodegen)
+- [sqlacodegen](https://github.com/agronholm/sqlacodegen)
+- [flask-migrate](https://github.com/miguelgrinberg/Flask-Migrate)
+- [alembic](https://alembic.sqlalchemy.org/en/latest/)
+- [pymysql](https://pymysql.readthedocs.io/en/latest/modules/connections.html)
+- [python-dotenv](https://saurabh-kumar.com/python-dotenv/#getting-started)
+- [marshmallow](https://marshmallow.readthedocs.io/en/stable/)
+- [marshmallow-sqlalchemy](https://marshmallow-sqlalchemy.readthedocs.io/en/latest/index.html)
+- [flask-marshmallow](https://flask-marshmallow.readthedocs.io/en/latest/index.html)
+- [webargs](https://webargs.readthedocs.io/en/latest/)
+- [pillow](https://pillow.readthedocs.io/en/stable/)
+- [captcha](https://github.com/lepture/captcha)
+
+### 前端
+
+- [jquery](https://jquery.cuishifeng.cn/)
+- [bootstarp](https://v4.bootcss.com/docs/getting-started/introduction/)
+- [layui](https://www.layuiweb.com/doc/index.htm)
+
 ## 用法
 
 1. T-flask默认使用 `pipenv` 作为包管理器，如果没有安装请执行下面命令
