@@ -7,7 +7,7 @@ class TokenCodeNotSetError(Exception):
     ...
 
 
-def _on_gen_token():
+def _default_gen_token():
     return "".join([
         str(random.randint(0, 9)),
         str(random.randint(0, 9)),
@@ -18,22 +18,28 @@ def _on_gen_token():
 
 class TokenCode:
 
-    def __init__(self, auto_run=True, expire_time=300, retries=5, token_byte_size=3, on_gen_token=None):
+    def __init__(self, app=None):
         self._token_pool = {}
-
-        self.expire_time = expire_time
-        self.retries = retries
-        self.token_byte_size = token_byte_size
-
-        if on_gen_token is None:
-            self.on_gen_token = _on_gen_token
-        else:
-            self.on_gen_token = on_gen_token
-
         self.is_running = True
         self.thread = None
 
-        if auto_run:
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        self.app = app
+
+        self.expire_time = app.config.get('TOKEN_CODE_EXPIRE_TIME', 300)
+        self.retries = app.config.get('TOKEN_CODE_RETRIES', 5)
+        self.token_byte_size = app.config.get('TOKEN_CODE_BYTE_SIZE', 3)
+
+        on_gen_token = app.config.get('TOKEN_CODE_ON_GEN_TOKEN', None)
+        if on_gen_token is None:
+            self.on_gen_token = _default_gen_token
+        else:
+            self.on_gen_token = on_gen_token
+
+        if app.config.get('TOKEN_CODE_AUTO_RUN', False):
             self.run()
 
     def __len__(self):
@@ -68,7 +74,7 @@ class TokenCode:
             for k in list(self._token_pool.keys()):
                 if self._token_pool[k]['expire'] < time.time():
                     try:
-                        del self._token_pool[k]
+                        self._token_pool.pop(k)
                     except KeyError:
                         ...
             time.sleep(1)
@@ -83,4 +89,8 @@ class TokenCode:
         self.is_running = False
 
 
-tc = TokenCode(expire_time=600)
+tc = TokenCode()
+
+
+def init_token_code(app):
+    tc.init_app(app)

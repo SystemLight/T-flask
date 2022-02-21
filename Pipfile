@@ -8,13 +8,10 @@ flask = "*"
 flask-sqlacodegen = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
+flask-marshmallow = "*"
 pymysql = "*"
 python-dotenv = "*"
 marshmallow-sqlalchemy = "*"
-flask-marshmallow = "*"
-webargs = "*"
-pillow = "*"
-captcha = "*"
 
 [dev-packages]
 

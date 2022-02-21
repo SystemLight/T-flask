@@ -3,6 +3,25 @@ import os
 from flask import request
 
 
+def get_file_size(file_path):
+    return get_readable_size(os.path.getsize(file_path))
+
+
+def get_readable_size(f_size):
+    if f_size < 1024:
+        return str(f_size) + "Byte"
+    else:
+        kbx = f_size / 1024
+        if kbx < 1024:
+            return str(round(kbx, 2)) + "K"
+        else:
+            mbx = kbx / 1024
+            if mbx < 1024:
+                return str(round(mbx, 2)) + "M"
+            else:
+                return str(round(mbx / 1024)) + "G"
+
+
 class ExistsError(Exception):
     ...
 
@@ -117,22 +136,3 @@ class SliceSaveFile:
             self.options.on_process(result, self.save_path)
 
         return result
-
-
-def get_file_size(file_path):
-    return get_readable_size(os.path.getsize(file_path))
-
-
-def get_readable_size(f_size):
-    if f_size < 1024:
-        return str(f_size) + "Byte"
-    else:
-        kbx = f_size / 1024
-        if kbx < 1024:
-            return str(round(kbx, 2)) + "K"
-        else:
-            mbx = kbx / 1024
-            if mbx < 1024:
-                return str(round(mbx, 2)) + "M"
-            else:
-                return str(round(mbx / 1024)) + "G"

@@ -49,6 +49,7 @@ fields.Boolean.default_error_messages = {
 
 
 class Query(BaseQuery):
+
     def soft_delete(self):
         return self.update({"delete_at": datetime.datetime.now()})
 
