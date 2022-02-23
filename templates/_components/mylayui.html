@@ -1,0 +1,151 @@
+{% macro load() %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='my-layui/my-layui.css') }}">
+    <script src="{{ url_for('static',filename='my-layui/my-layui.js') }}"></script>
+{% endmacro %}
+
+{% macro TextInput(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <input type="text" name="{{ name }}" class="layui-input">
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro FileInput(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item" mylayui-skin="file" mylayui-name="{{ name }}">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block pure__d-flex"></div>
+    </div>
+{% endmacro %}
+
+{% macro NumberInput(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <input type="number" name="{{ name }}" class="layui-input">
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro PasswordInput(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <input type="password" name="{{ name }}" class="layui-input">
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro Select(form_id,name,label,options) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <select name="{{ name }}">
+                {% for option in options %}
+                    <option value="{{ option[0] }}">{{ option[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro CheckBox(form_id,name,label,options) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            {% for option in options %}
+                <input type="checkbox" name="{{ name }}[{{ option[0] }}]" title="{{ option[1] }}">
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro Switch(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="{{ name }}" lay-skin="switch">
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro RadioBox(form_id,name,label,options) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            {% for option in options %}
+                <input type="radio" name="{{ name }}" value="{{ option[0] }}" title="{{ option[1] }}">
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro Textarea(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block">
+            <textarea name="{{ name }}" class="layui-textarea"></textarea>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro Submit(form_id,name) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="{{ name }}">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro Form(form_id,contents) %}
+    <form class="layui-form" action="" lay-filter="{{ form_id }}">
+        {% for content in contents %}
+            {% if content[0]=='TextInput' %}
+                {{ TextInput(form_id,*content[1]) }}
+            {% elif content[0]=='FileInput' %}
+                {{ FileInput(form_id,*content[1]) }}
+            {% elif content[0]=='NumberInput' %}
+                {{ TextInput(form_id,*content[1]) }}
+            {% elif content[0]=='PasswordInput' %}
+                {{ PasswordInput(form_id,*content[1]) }}
+            {% elif content[0]=='Select' %}
+                {{ Select(form_id,*content[1]) }}
+            {% elif content[0]=='CheckBox' %}
+                {{ CheckBox(form_id,*content[1]) }}
+            {% elif content[0]=='Switch' %}
+                {{ Switch(form_id,*content[1]) }}
+            {% elif content[0]=='RadioBox' %}
+                {{ RadioBox(form_id,*content[1]) }}
+            {% elif content[0]=='Textarea' %}
+                {{ Textarea(form_id,*content[1]) }}
+            {% elif content[0]=='Submit' %}
+                {{ Submit(form_id,*content[1]) }}
+            {% endif %}
+        {% endfor %}
+    </form>
+{% endmacro %}
+
+{% macro FormComponent(form_id,contents) %}
+    {{ Form(form_id,contents) }}
+    <script>
+        myLayuiFormPool['{{ form_id }}'] = new MyLayuiForm('{{ form_id | safe }}', {{ contents | safe }}, true);
+    </script>
+{% endmacro %}
+
+{% macro Dialog(dialog_id) %}
+    <script id="layui-dialog-{{ dialog_id }}-template" type="text/html">{{ caller() }}</script>
+{% endmacro %}
+
+{% macro DialogComponent(dialog_id,contents) %}
+    <script id="layui-dialog-{{ dialog_id }}-template" type="text/html">
+        {{ Form(dialog_id+'DialogForm',contents) }}
+    </script>
+    <script>
+        myLayuiFormDialogPool['{{ dialog_id }}'] = new MyLayuiFormDialog(
+            new MyLayuiDialog('{{ dialog_id }}'),
+            new MyLayuiForm('{{ dialog_id+'DialogForm' }}', {{ contents | safe }}, false)
+        );
+    </script>
+{% endmacro %}

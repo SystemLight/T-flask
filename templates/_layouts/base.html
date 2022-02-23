@@ -14,9 +14,11 @@
         <meta name="description" content="描述"/>
     {% endblock %}
     <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/pure.css') }}">
     <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='layui/layui.js') }}"></script>
     <script src="{{ url_for('static',filename='notify.js') }}"></script>
+    <script src="{{ url_for('static',filename='underscore.min.js') }}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>

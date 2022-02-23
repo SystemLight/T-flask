@@ -1,7 +1,50 @@
 {% extends '_layouts/base.html' %}
+{% import '_components/mylayui.html' as mylayui %}
 
 {% block title %}首页{% endblock %}
 
+{% block head %}
+    {{ mylayui.load() }}
+{% endblock %}
+
 {% block body %}
     <h1>Hello T-flask</h1>
+    <div style="width: 700px;margin: 0 auto">
+        {{ mylayui.FormComponent('hello',[
+            ['TextInput', ['TextInput', 'TextInput']],
+            ['FileInput', ['FileInput', 'FileInput']],
+            ['FileInput', ['FileInput2', 'FileInput2']],
+            ['NumberInput', ['NumberInput', 'NumberInput']],
+            ['PasswordInput', ['PasswordInput', 'PasswordInput']],
+            ['Select', ['Select', 'Select', [['a', 'a'], ['b', 'b']]]],
+            ['CheckBox', ['CheckBox', 'CheckBox', [['a', 'a'], ['b', 'b']]]],
+            ['Switch', ['Switch', 'Switch']],
+            ['RadioBox', ['RadioBox', 'RadioBox', [['a', 'a'], ['b', 'b']]]],
+            ['Textarea', ['Textarea', 'Textarea']],
+            ['Submit', ['Submit']]
+        ]) }}
+    </div>
+    {{ mylayui.DialogComponent('hello_dialog',[
+            ['TextInput', ['TextInput', 'TextInput']],
+            ['FileInput', ['FileInput', 'FileInput']],
+            ['NumberInput', ['NumberInput', 'NumberInput']],
+            ['PasswordInput', ['PasswordInput', 'PasswordInput']],
+            ['Select', ['Select', 'Select', [['a', 'a'], ['b', 'b']]]],
+            ['CheckBox', ['CheckBox', 'CheckBox', [['a', 'a'], ['b', 'b']]]],
+            ['Switch', ['Switch', 'Switch']],
+            ['RadioBox', ['RadioBox', 'RadioBox', [['a', 'a'], ['b', 'b']]]],
+            ['Textarea', ['Textarea', 'Textarea']],
+            ['Submit', ['Submit2']]
+        ]) }}
+{% endblock %}
+
+{% block script %}
+    <script>
+        var form = layui.form;
+
+        form.on('submit(Submit)', function () {
+            console.log(myLayuiFormPool['hello'].getJsonData());
+            myLayuiFormDialogPool['hello_dialog'].open('标题');
+        });
+    </script>
 {% endblock %}

@@ -27,7 +27,6 @@
 
 - [jquery](https://jquery.cuishifeng.cn/)
 - [underscore](https://www.underscorejs.com.cn/)
-- [bootstarp](https://v4.bootcss.com/docs/getting-started/introduction/)
 - [layui](https://www.layuiweb.com/doc/index.htm)
 - [notify](https://gitee.com/u33/notify)
 - [layui 第三方组件平台](https://layui.org.cn/fly/extend/index.html)
