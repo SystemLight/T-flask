@@ -204,6 +204,18 @@ location /socket.io/ {
 }
 ```
 
+9. SSE支持
+
+```
+def stream():
+    yield 'data: {}\n\n'
+
+
+@app.route('/message', methods=['GET'])
+def message():
+    return Response(stream(), mimetype="text/event-stream")
+```
+
 - 注意事项：
 
     - 反向代理可能会跨域，设置SocketIO跨域参数即可
