@@ -25,9 +25,9 @@ const MyLayuiForm = (function () {
             // render file
             $('form[lay-filter=' + this.formID + ']').children('[mylayui-skin="file"]').each(function () {
                 var name = $(this).attr('mylayui-name');
-                var mockInput = $('<input class="layui-input layui-disabled" type="text" disabled>');
+                var mockInput = $('<input class="layui-input layui-disabled" name="' + name + '" type="text" disabled>');
                 var chooseFileButton = $('<button type="button" class="layui-btn">选择文件</button>');
-                var fileInput = $('<input type="file" name="' + name + '" class="layui-hide">');
+                var fileInput = $('<input type="file" class="layui-hide">');
                 var formItem = $(this);
 
                 formItem.append(fileInput);
@@ -40,12 +40,17 @@ const MyLayuiForm = (function () {
                 fileInput.on('change', function (e) {
                     var val = $(this).val();
                     mockInput.val(val.substring(val.lastIndexOf('\\') + 1));
-                    self._formValue[name + '[files]'] = $(this)[0].files[0];
+                    self._formValue[name + '[file]'] = $(this)[0].files[0];
                 });
             });
+
+            // render image
         },
         getData: function () {
             return $.extend({}, this._formValue, layui.form.val(this.formID))
+        },
+        setData: function (data) {
+            layui.form.val(this.formID, data);
         },
         getFormData: function (receipt) {
             var jsonVal = this.getJsonData(receipt);
@@ -80,7 +85,10 @@ const MyLayuiForm = (function () {
             return data[name];
         },
         getFileInputVal: function (data, name) {
-            return data[name + '[files]'];
+            return data[name + '[file]'];
+        },
+        getImageInputVal: function (data, name) {
+            return data[name + '[image]'];
         },
         getNumberInputVal: function (data, name) {
             return Number(data[name]);
@@ -144,12 +152,13 @@ const MyLayuiFormDialog = (function () {
     };
 
     cls.prototype = {
-        open: function (title, end) {
+        open: function (title, success, end) {
             var self = this;
             this.dialog.open({
                 title: title,
                 success: function () {
                     self.form.render();
+                    success && success();
                 },
                 end: end
             });

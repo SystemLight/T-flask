@@ -68,6 +68,6 @@ db = SQLAlchemy(query_class=Query)
 ma = Marshmallow()
 
 
-def init_databases(app: Flask):
+def init_model(app: Flask):
     db.init_app(app)
     ma.init_app(app)

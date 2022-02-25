@@ -19,6 +19,13 @@
     </div>
 {% endmacro %}
 
+{% macro ImageInput(form_id,name,label) %}
+    <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item" mylayui-skin="image" mylayui-name="{{ name }}">
+        <label class="layui-form-label">{{ label }}</label>
+        <div class="layui-input-block"></div>
+    </div>
+{% endmacro %}
+
 {% macro NumberInput(form_id,name,label) %}
     <div id="layui-form-item-{{ form_id }}-{{ name }}" class="layui-form-item">
         <label class="layui-form-label">{{ label }}</label>
@@ -106,8 +113,10 @@
                 {{ TextInput(form_id,*content[1]) }}
             {% elif content[0]=='FileInput' %}
                 {{ FileInput(form_id,*content[1]) }}
+            {% elif content[0]=='ImageInput' %}
+                {{ ImageInput(form_id,*content[1]) }}
             {% elif content[0]=='NumberInput' %}
-                {{ TextInput(form_id,*content[1]) }}
+                {{ NumberInput(form_id,*content[1]) }}
             {% elif content[0]=='PasswordInput' %}
                 {{ PasswordInput(form_id,*content[1]) }}
             {% elif content[0]=='Select' %}
@@ -138,9 +147,11 @@
     <script id="layui-dialog-{{ dialog_id }}-template" type="text/html">{{ caller() }}</script>
 {% endmacro %}
 
-{% macro DialogComponent(dialog_id,contents) %}
+{% macro DialogComponent(dialog_id,contents,class="") %}
     <script id="layui-dialog-{{ dialog_id }}-template" type="text/html">
-        {{ Form(dialog_id+'DialogForm',contents) }}
+        <div class="{{ class }}">
+            {{ Form(dialog_id+'DialogForm',contents) }}
+        </div>
     </script>
     <script>
         myLayuiFormDialogPool['{{ dialog_id }}'] = new MyLayuiFormDialog(
