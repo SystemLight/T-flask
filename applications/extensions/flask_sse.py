@@ -16,8 +16,8 @@ class Recycle:
 
 class Stream:
 
-    def __init__(self, sse, stream_func):
-        self.sse = sse
+    def __init__(self, _sse, stream_func):
+        self.sse = _sse
         self.deal_ping = lambda *args: 'ping'
         self.deal_recycle = lambda *args: 'recycle'
         self.deal_message = stream_func
@@ -40,9 +40,6 @@ class Stream:
 
     def on_recycle(self, func):
         self.deal_recycle = func
-
-    def on_message(self, func):
-        self.deal_message = func
 
 
 class Monitor:
@@ -76,12 +73,16 @@ class ServerSentEvents:
         if app:
             self.init_app(app)
 
-    def stream(self, func):
-        return Stream(self, func)
-
     @staticmethod
     def message(data):
         return f'data: {data}\n\n'
+
+    @staticmethod
+    def response(gen_func):
+        def wrap(*args):
+            return Response(stream_with_context(gen_func(*args)), mimetype="text/event-stream")
+
+        return wrap
 
     def init_app(self, app):
         self.app = app
@@ -124,6 +125,9 @@ class ServerSentEvents:
                     break
                 yield Ping()
         yield Recycle()
+
+    def stream(self, func):
+        return Stream(self, func)
 
     def _run_gc_task(self):
         while self._is_thread_flag:

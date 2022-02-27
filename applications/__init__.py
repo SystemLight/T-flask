@@ -6,6 +6,7 @@ from flask import Flask
 from .configs import config
 from .extensions import init_plugs
 from .view import init_view
+from .scripts import init_scripts
 
 
 def create_app(config_name: Optional[Literal['development', 'testing', 'production']] = None):
@@ -18,5 +19,6 @@ def create_app(config_name: Optional[Literal['development', 'testing', 'producti
 
     init_plugs(app)
     init_view(app)
+    init_scripts(app)
 
     return app

@@ -1,0 +1,12 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}SSE{% endblock %}
+
+{% block script %}
+    <script>
+        var sse = new EventSource('/sse/stream');
+        sse.onmessage = function (e) {
+            console.log(e.data);
+        }
+    </script>
+{% endblock %}
