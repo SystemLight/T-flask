@@ -18,6 +18,10 @@ class TaskThread(Thread):
     def is_stop(self):
         return self._is_stop
 
+    @property
+    def is_run_flag(self):
+        return self._is_run_flag
+
     def run(self) -> None:
         self._is_run_flag = True
         self._is_stop = False
