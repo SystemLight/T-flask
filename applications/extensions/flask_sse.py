@@ -1,5 +1,7 @@
+import copy
 import queue
 import time
+import weakref
 from threading import Thread
 from collections import defaultdict
 
@@ -66,7 +68,7 @@ class ServerSentEvents:
     Recycle = Recycle
 
     def __init__(self, app=None):
-        self._event_pool = defaultdict(lambda: [])
+        self._event_pool = defaultdict(lambda: weakref.WeakSet())
         self._is_thread_flag = True
         self._thread = Thread(target=self._run_gc_task, daemon=True)
 
@@ -86,7 +88,7 @@ class ServerSentEvents:
 
     def init_app(self, app):
         self.app = app
-        self.maxsize = self.app.config.get('SSE_MAXSIZE', 50)  # 派发10次无消费者
+        self.maxsize = self.app.config.get('SSE_MAXSIZE', 0)  # 派发n次无消费者则销毁
         self.overtime = self.app.config.get('SSE_OVERTIME', 1800)  # 超过30分钟无消费者
         self.ping_time = self.app.config.get('SSE_PING_TIME', 1)  # 固定时间内无数据派发则派发一个ping包
         self.sse_gc = self.app.config.get('SSE_GC', False)  # 是否开启自动gc回收超时容器
@@ -107,7 +109,7 @@ class ServerSentEvents:
         self._event_pool.pop(key)
 
     def emit(self, key: str, args=None):
-        for mo in self._event_pool[key][:]:
+        for mo in copy.copy(self._event_pool[key]):
             try:
                 mo.put(args)
             except queue.Full:
@@ -116,7 +118,7 @@ class ServerSentEvents:
 
     def listen(self, key: str):
         mo = Monitor(queue.Queue(maxsize=self.maxsize))
-        self._event_pool[key].append(mo)
+        self._event_pool[key].add(mo)
         while True:
             try:
                 yield mo.get(timeout=self.ping_time)
