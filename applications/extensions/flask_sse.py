@@ -68,6 +68,16 @@ class ServerSentEvents:
     Recycle = Recycle
 
     def __init__(self, app=None):
+        """
+
+        通过三种策略去解决内存溢出危险::
+
+            1. 弱引用，当listen方法不被使用，即stream断开连接时自动回收队列内存
+            2. 派发次数限制，默认不限制，当派发次数存储到指定大小时如果仍未消费自动清除监听
+            3. 线程GC，默认未开启，给定时间内检查并清除失活的队列即未进行消费处理的队列
+
+        :param app:
+        """
         self._event_pool = defaultdict(lambda: weakref.WeakSet())
         self._is_thread_flag = True
         self._thread = Thread(target=self._run_gc_task, daemon=True)
@@ -89,9 +99,9 @@ class ServerSentEvents:
     def init_app(self, app):
         self.app = app
         self.maxsize = self.app.config.get('SSE_MAXSIZE', 0)  # 派发n次无消费者则销毁
-        self.overtime = self.app.config.get('SSE_OVERTIME', 1800)  # 超过30分钟无消费者
         self.ping_time = self.app.config.get('SSE_PING_TIME', 1)  # 固定时间内无数据派发则派发一个ping包
         self.sse_gc = self.app.config.get('SSE_GC', False)  # 是否开启自动gc回收超时容器
+        self.overtime = self.app.config.get('SSE_OVERTIME', 1800)  # 超过30分钟无消费者
 
         if self.sse_gc:
             self._thread.start()
