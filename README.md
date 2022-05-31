@@ -97,10 +97,9 @@ logto = ./info.log
 wsgi-file= ./wsgi.py
 callable = app
 vacuum = True
-http-keepalive = True
 master = True
 processes = 1
-threads = 128
+threads = 100
 max-requests = 5000
 ```
 
@@ -120,11 +119,30 @@ daemonize = ./%(project).log
 wsgi-file= ./wsgi.py
 callable = app
 vacuum = True
-http-keepalive = True
 master = True
 processes = 1
-threads = 128
+threads = 100
 max-requests = 5000
+```
+
+- uwsgi+gevent实现IO密集型异步并发处理
+
+```text
+[uwsgi]
+project = t-flask
+socket = 127.0.0.1:5000
+chmod-socket = 666
+uid = root
+gid = root
+chdir = /www/wwwroot/%(project)/server
+logto = ./info.log
+wsgi-file = ./wsgi.py
+callable = app
+vacuum = True
+master = True
+processes = 1
+gevent = 100
+gevent-monkey-patch = True
 ```
 
 - uwsgi启动并且支持websocket访问
@@ -146,10 +164,8 @@ vacuum = True
 http-keepalive = True
 master = True
 processes = 1
-threads = 128
-gevent = 1000
-async = 30
-max-requests = 5000
+gevent = 100
+max-requests = 1000
 ```
 
 - 配置nginx代理：/etc/nginx/sites-enabled/default
